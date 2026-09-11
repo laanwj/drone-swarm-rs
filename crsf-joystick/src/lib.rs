@@ -16,9 +16,8 @@ use evdev::uinput::VirtualDevice;
 use evdev::{AbsoluteAxisCode, AttributeSet, InputId, KeyCode, MiscCode, UinputAbsSetup};
 use metrics::counter;
 
-/// CRSF channels are 11-bit values. We expose them on the wire with the
-/// same range upstream tools use (`crsf-forward`, autopilot RC).
-pub const AXIS_MAX: u16 = 1983; // 1984 - 1
+/// CRSF physical maximum (PWM 2012 µs).
+pub const AXIS_MAX: u16 = 1811;
 
 /// CRSF 11-bit nominal minimum (PWM 988 µs).
 pub const AXIS_MIN: u16 = 172;
@@ -73,31 +72,31 @@ impl Joystick {
 
         let abs_setup = UinputAbsSetup::new(
             AbsoluteAxisCode::ABS_X,
-            evdev::AbsInfo::new(0, 0, AXIS_MAX.into(), 7, 127, 0),
+            evdev::AbsInfo::new(AXIS_MID.into(), AXIS_MIN.into(), AXIS_MAX.into(), 7, 127, 0),
         );
         let abs_y = UinputAbsSetup::new(
             AbsoluteAxisCode::ABS_Y,
-            evdev::AbsInfo::new(0, 0, AXIS_MAX.into(), 7, 127, 0),
+            evdev::AbsInfo::new(AXIS_MID.into(), AXIS_MIN.into(), AXIS_MAX.into(), 7, 127, 0),
         );
         let abs_z = UinputAbsSetup::new(
             AbsoluteAxisCode::ABS_Z,
-            evdev::AbsInfo::new(0, 0, AXIS_MAX.into(), 7, 127, 0),
+            evdev::AbsInfo::new(AXIS_MIN.into(), AXIS_MIN.into(), AXIS_MAX.into(), 7, 127, 0),
         );
         let abs_rx = UinputAbsSetup::new(
             AbsoluteAxisCode::ABS_RX,
-            evdev::AbsInfo::new(0, 0, AXIS_MAX.into(), 7, 127, 0),
+            evdev::AbsInfo::new(AXIS_MID.into(), AXIS_MIN.into(), AXIS_MAX.into(), 7, 127, 0),
         );
         let abs_throttle = UinputAbsSetup::new(
             AbsoluteAxisCode::ABS_THROTTLE,
-            evdev::AbsInfo::new(0, 0, AXIS_MAX.into(), 7, 127, 0),
+            evdev::AbsInfo::new(AXIS_MIN.into(), AXIS_MIN.into(), AXIS_MAX.into(), 7, 127, 0),
         );
         let abs_rudder = UinputAbsSetup::new(
             AbsoluteAxisCode::ABS_RUDDER,
-            evdev::AbsInfo::new(0, 0, AXIS_MAX.into(), 7, 127, 0),
+            evdev::AbsInfo::new(AXIS_MID.into(), AXIS_MIN.into(), AXIS_MAX.into(), 7, 127, 0),
         );
         let abs_wheel = UinputAbsSetup::new(
             AbsoluteAxisCode::ABS_WHEEL,
-            evdev::AbsInfo::new(0, 0, AXIS_MAX.into(), 7, 127, 0),
+            evdev::AbsInfo::new(AXIS_MIN.into(), AXIS_MIN.into(), AXIS_MAX.into(), 7, 127, 0),
         );
 
         let mut msc_set = AttributeSet::<MiscCode>::new();
