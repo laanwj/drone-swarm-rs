@@ -19,7 +19,7 @@ use std::fmt;
 use std::time::{Duration, Instant};
 
 use clap::Parser;
-use crsf_joystick::{AXIS_MAX, AXIS_MID, Joystick, SAFE_DEFAULT_CHANNELS};
+use crsf_joystick::{AXIS_MAX, AXIS_MID, AXIS_MIN, Joystick, SAFE_DEFAULT_CHANNELS};
 use log::{error, info, trace, warn};
 use metrics::{Unit, counter, describe_counter};
 use metrics_exporter_tcp::TcpBuilder;
@@ -202,7 +202,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
                     continue;
                 };
                 counter!("joystick.crsf.rx_rc_channels").increment(1);
-                if channels.channels.iter().any(|&c| c > AXIS_MAX) {
+                if channels
+                    .channels
+                    .iter()
+                    .any(|&c| !(AXIS_MIN..=AXIS_MAX).contains(&c))
+                {
                     warn!("Channel out of range: {:?}", channels.channels);
                     continue;
                 }
