@@ -10,5 +10,5 @@ telemetry-lib = { workspace = true }
 log = { workspace = true }
 tokio = { workspace = true }
 metrics = { workspace = true }
-metrics-exporter-tcp = { workspace = true }
+metrics-exporter-statsd = { workspace = true }
 zenoh = { workspace = true }

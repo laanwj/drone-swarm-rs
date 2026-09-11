@@ -12,7 +12,7 @@
 use clap::Parser;
 use log::{error, info, trace, warn};
 use metrics::{Unit, counter, describe_counter};
-use metrics_exporter_tcp::TcpBuilder;
+use metrics_exporter_statsd::StatsdBuilder;
 use std::sync::Arc;
 use std::time::Duration;
 use telemetry_lib::crsf_custom;
@@ -48,13 +48,13 @@ struct Args {
     #[arg(long, default_value = topics::DEFAULT_PREFIX)]
     zenoh_prefix: String,
 
-    /// Enable metrics reporting using metrics-rs-tcp-exporter.
+    /// Enable metrics reporting to a StatsD collector.
     #[arg(long, default_value_t = false)]
-    metrics_tcp: bool,
+    metrics_statsd: bool,
 
-    /// Bind address for metrics-rs-tcp-exporter.
-    #[arg(long, default_value = "127.0.0.1:5002")]
-    metrics_tcp_bind: std::net::SocketAddr,
+    /// Destination address for the StatsD collector.
+    #[arg(long, default_value = "127.0.0.1:8125")]
+    metrics_statsd_destination: std::net::SocketAddr,
 }
 
 const TELEMETRY_INTERVAL: Duration = Duration::from_millis(100);
@@ -67,11 +67,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
 
     info!("Starting liftoff-input");
 
-    if args.metrics_tcp {
-        let builder = TcpBuilder::new().listen_address(args.metrics_tcp_bind);
-        builder
-            .install()
-            .expect("failed to install metrics TCP exporter");
+    if args.metrics_statsd {
+        let host = args.metrics_statsd_destination.ip().to_string();
+        let recorder = StatsdBuilder::from(&host, args.metrics_statsd_destination.port())
+            .build(None)
+            .expect("failed to create StatsD recorder");
+        metrics::set_global_recorder(recorder)
+            .expect("failed to install StatsD recorder");
     }
 
     describe_counter!(

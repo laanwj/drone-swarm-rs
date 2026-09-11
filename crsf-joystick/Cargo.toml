@@ -9,7 +9,7 @@ env_logger = { workspace = true }
 evdev = "0.13.2"
 log = { workspace = true }
 metrics = { workspace = true }
-metrics-exporter-tcp = { workspace = true }
+metrics-exporter-statsd = { workspace = true }
 telemetry-lib = { workspace = true }
 tokio = { workspace = true }
 zenoh = { workspace = true }

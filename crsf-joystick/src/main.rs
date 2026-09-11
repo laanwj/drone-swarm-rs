@@ -22,7 +22,7 @@ use clap::Parser;
 use crsf_joystick::{AXIS_MAX, AXIS_MID, AXIS_MIN, Joystick, SAFE_DEFAULT_CHANNELS};
 use log::{error, info, trace, warn};
 use metrics::{Unit, counter, describe_counter};
-use metrics_exporter_tcp::TcpBuilder;
+use metrics_exporter_statsd::StatsdBuilder;
 use telemetry_lib::crsf::{self, CrsfPacket};
 use telemetry_lib::topics;
 use zenoh::Config;
@@ -105,13 +105,13 @@ struct Args {
     #[arg(long, default_value = "100")]
     source_timeout_ms: u64,
 
-    /// Enable metrics reporting using metrics-rs-tcp-exporter.
+    /// Enable metrics reporting to a StatsD collector.
     #[arg(long, default_value_t = false)]
-    metrics_tcp: bool,
+    metrics_statsd: bool,
 
-    /// Bind address for metrics-rs-tcp-exporter.
-    #[arg(long, default_value = "127.0.0.1:5004")]
-    metrics_tcp_bind: std::net::SocketAddr,
+    /// Destination address for the StatsD collector.
+    #[arg(long, default_value = "127.0.0.1:8125")]
+    metrics_statsd_destination: std::net::SocketAddr,
 }
 
 enum Event {
@@ -127,11 +127,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
 
     info!("Starting crsf-joystick");
 
-    if args.metrics_tcp {
-        let builder = TcpBuilder::new().listen_address(args.metrics_tcp_bind);
-        builder
-            .install()
-            .expect("failed to install metrics TCP exporter");
+    if args.metrics_statsd {
+        let host = args.metrics_statsd_destination.ip().to_string();
+        let recorder = StatsdBuilder::from(&host, args.metrics_statsd_destination.port())
+            .build(None)
+            .expect("failed to create StatsD recorder");
+        metrics::set_global_recorder(recorder)
+            .expect("failed to install StatsD recorder");
     }
 
     describe_counter!("joystick.crsf.rx", Unit::Count, "CRSF frames received");

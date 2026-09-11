@@ -25,7 +25,7 @@ quad-flight-control = { path = "vendor/quad-flight-control" }
 log = "0.4.29"
 tokio = { version = "1.49.0", features = ["full"] }
 metrics = "0.24.3"
-metrics-exporter-tcp = "0.11.1"
+metrics-exporter-statsd = "0.9.0"
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.149"
 tokio-tungstenite = "0.24"

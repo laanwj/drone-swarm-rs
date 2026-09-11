@@ -148,10 +148,10 @@ Options:
           Zenoh mode (peer or client) [default: peer]
       --zenoh-prefix <ZENOH_PREFIX>
           Zenoh topic prefix [default: liftoff]
-      --metrics-tcp
-          Enable metrics reporting using metrics-rs-tcp-exporter
-      --metrics-tcp-bind <METRICS_TCP_BIND>
-          Bind address for metrics-rs-tcp-exporter [default: 127.0.0.1:5000]
+      --metrics-statsd
+          Enable metrics reporting to a StatsD collector
+      --metrics-statsd-destination <METRICS_STATSD_DESTINATION>
+          Destination address for the StatsD collector [default: 127.0.0.1:8125]
   -h, --help
           Print help
   -V, --version
@@ -173,10 +173,10 @@ Options:
           Zenoh mode (peer or client) [default: peer]
       --zenoh-prefix <ZENOH_PREFIX>
           Zenoh topic prefix [default: liftoff]
-      --metrics-tcp
-          Enable metrics reporting using metrics-rs-tcp-exporter
-      --metrics-tcp-bind <METRICS_TCP_BIND>
-          Bind address for metrics-rs-tcp-exporter [default: 127.0.0.1:5002]
+      --metrics-statsd
+          Enable metrics reporting to a StatsD collector
+      --metrics-statsd-destination <METRICS_STATSD_DESTINATION>
+          Destination address for the StatsD collector [default: 127.0.0.1:8125]
   -h, --help
           Print help
   -V, --version
@@ -194,10 +194,10 @@ Options:
           Zenoh mode (peer or client) [default: peer]
       --zenoh-prefix <ZENOH_PREFIX>
           Zenoh topic prefix [default: liftoff]
-      --metrics-tcp
-          Enable metrics reporting using metrics-rs-tcp-exporter
-      --metrics-tcp-bind <METRICS_TCP_BIND>
-          Bind address for metrics-rs-tcp-exporter [default: 127.0.0.1:5004]
+      --metrics-statsd
+          Enable metrics reporting to a StatsD collector
+      --metrics-statsd-destination <METRICS_STATSD_DESTINATION>
+          Destination address for the StatsD collector [default: 127.0.0.1:8125]
   -h, --help
           Print help
   -V, --version
@@ -240,10 +240,10 @@ Options:
           Zenoh mode (peer or client) [default: peer]
       --zenoh-prefix <ZENOH_PREFIX>
           Zenoh topic prefix [default: liftoff]
-      --metrics-tcp
-          Enable metrics reporting using metrics-rs-tcp-exporter
-      --metrics-tcp-bind <METRICS_TCP_BIND>
-          Bind address for metrics-rs-tcp-exporter [default: 127.0.0.1:5003]
+      --metrics-statsd
+          Enable metrics reporting to a StatsD collector
+      --metrics-statsd-destination <METRICS_STATSD_DESTINATION>
+          Destination address for the StatsD collector [default: 127.0.0.1:8125]
   -h, --help
           Print help
   -V, --version
@@ -302,10 +302,10 @@ To get super-verbose output for troubleshooting, use debug level `debug` or `tra
 The services make use of `metrics-rs` to track internal metrics for observability,
 
 ```
-target/release/crsf-forward --metrics-tcp --metrics-tcp-bind 127.0.0.1:5000
+target/release/crsf-forward --metrics-statsd --metrics-statsd-destination 127.0.0.1:8125
 ```
 
-These can then be connected to and shown using, for example, [metrics-observer](https://github.com/metrics-rs/metrics/tree/main/metrics-observer).
+Metrics are emitted as StatsD UDP packets and can be viewed with any StatsD-compatible receiver, such as `netcat -u -l 8125` or a local StatsD agent.
 
 ## Related projects
 
