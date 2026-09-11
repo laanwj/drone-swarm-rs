@@ -20,14 +20,28 @@ use metrics::counter;
 /// same range upstream tools use (`crsf-forward`, autopilot RC).
 pub const AXIS_MAX: u16 = 1983; // 1984 - 1
 
-/// Channel midpoint — splits 2-pos switches and gates the 500 ms manual
-/// override timeout in the mux.
+/// CRSF 11-bit nominal minimum (PWM 988 µs).
+pub const AXIS_MIN: u16 = 172;
+
+/// Channel midpoint — splits 2-pos switches and gates source selection.
 pub const AXIS_MID: u16 = 992;
 
 /// 3-position switch thresholds. Below LEFT = position-0, above RIGHT =
 /// position-2, in between = position-1.
 pub const AXIS_3POS_LEFT: u16 = 592;
 pub const AXIS_3POS_RIGHT: u16 = 1392;
+
+/// Safe default channel values used when the active RC source goes silent.
+/// Sticks are centered, throttle is low, and switches are in safe/low
+/// positions.
+pub const SAFE_DEFAULT_CHANNELS: [u16; 16] = {
+    let mut c = [AXIS_MID; 16];
+    c[2] = AXIS_MIN; // throttle low
+    c[4] = AXIS_MIN; // SD / arm-disarm low
+    c[5] = AXIS_MIN; // SE low
+    c[7] = AXIS_MIN; // SA low
+    c
+};
 
 /// A virtual joystick driven by 16-channel CRSF RC frames.
 pub struct Joystick {
@@ -252,7 +266,11 @@ impl Joystick {
                 evdev::InputEvent::new(
                     evdev::EventType::KEY.0,
                     KeyCode::BTN_BASE3.0,
-                    if channels[10] >= AXIS_3POS_RIGHT { 1 } else { 0 },
+                    if channels[10] >= AXIS_3POS_RIGHT {
+                        1
+                    } else {
+                        0
+                    },
                 ),
             ]);
         }
@@ -267,7 +285,11 @@ impl Joystick {
                 evdev::InputEvent::new(
                     evdev::EventType::KEY.0,
                     KeyCode::BTN_BASE5.0,
-                    if channels[11] >= AXIS_3POS_RIGHT { 1 } else { 0 },
+                    if channels[11] >= AXIS_3POS_RIGHT {
+                        1
+                    } else {
+                        0
+                    },
                 ),
             ]);
         }
